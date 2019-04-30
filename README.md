@@ -20,4 +20,4 @@ json configuration file downloadable from google apis core
 
 ### credentials.py
 
-single python file with two methods (get_email(),  get_password() and get_bot_token()) that reaturn strings
+single python file with methods (get_email(),  get_password() and get_bot_token()) that return strings

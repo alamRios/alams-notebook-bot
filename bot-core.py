@@ -4,6 +4,10 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 
+import nltk
+from nltk.corpus import cess_esp
+
+cidx = nltk.text.ContextIndex([word.lower() for word in cess_esp.words()])
 cred = credentials.Certificate('firebase-credentials.json')
 default_app = firebase_admin.initialize_app(cred, {
     'databaseURL':'https://alams-notebook-bot.firebaseio.com'
@@ -27,12 +31,13 @@ def send_welcome(message):
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
     usr_id = message.from_user.id
-    print('>> user connected:',usr_id)
-    ref = db.reference('user')
-    snapshot = ref.order_by_child("userid").equal_to(usr_id).get()
-    print(snapshot)
-    '''doc = open('prueba.pdf','rb')
-    bot.send_document(message.from_user.id,doc)
-    '''
+    bot.send_chat_action(usr_id,'typing')
+    res = []
+    for word in nltk.word_tokenize(message.text):
+        res += cidx.similar_words(word)
+    if len(res) > 0:
+        bot.reply_to(message, ' '.join(res))
+    else:
+        bot.reply_to(message, "no se encontraron coincidencias")
     
 bot.polling()
